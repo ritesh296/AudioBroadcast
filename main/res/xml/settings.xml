@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="ConnectivityList"
+        android:title="Connectivity"
+        android:summary="Bluetooth"
+        android:entries="@array/connectivity_entries"
+        android:entryValues="@array/connectivity_entries"/>
+
+</PreferenceScreen>

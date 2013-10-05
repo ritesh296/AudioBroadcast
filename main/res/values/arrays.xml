@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="connectivity_entries">
+        <item>Bluetooth</item>
+        <item>WiFi P2P</item>
+        <item>3G</item>
+    </string-array>
+
+    <string-array name="connectivity_values">
+        <item>Bluetooth</item>
+        <item>WiFi P2P</item>
+        <item>3G</item>
+    </string-array>
+</resources>

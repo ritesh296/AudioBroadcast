@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/share_bluetooth"
+        android:icon="@drawable/share_bluetooth"
+        android:title="@string/share_bluetooth"
+        android:showAsAction="always"/>
+
+    <item android:id="@+id/action_share"
+        android:title="@string/share_wifi_p2p"
+        android:showAsAction="ifRoom"/>
+</menu>
