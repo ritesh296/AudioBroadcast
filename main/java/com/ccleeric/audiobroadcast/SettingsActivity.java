@@ -3,26 +3,29 @@ package com.ccleeric.audiobroadcast;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 /**
  * Created by ccleeric on 13/10/4.
  */
 public class SettingsActivity extends Activity {
+    private PrefsFragement mPrefsFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new PrefsFragement()).commit();
+        mPrefsFragment = new PrefsFragement();
+        getFragmentManager().beginTransaction().replace(android.R.id.content, mPrefsFragment).commit();
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
     }
 
 
     public static class PrefsFragement extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+        public static final String CONNECTIVITY_PREF = "ConnectivityPref";
+        public static final String AUDIO_SOURCE_PREF = "AudioSourcePref";
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -30,6 +33,18 @@ public class SettingsActivity extends Activity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings);
 
+            restoreSettings();
+        }
+
+        //Restore Settings Values
+        public void restoreSettings() {
+            SharedPreferences settingsPref = getPreferenceScreen().getSharedPreferences();
+
+            Preference connectivityPref = findPreference(CONNECTIVITY_PREF);
+            connectivityPref.setSummary(settingsPref.getString(CONNECTIVITY_PREF, ""));
+
+            Preference audioSourcePref = findPreference(AUDIO_SOURCE_PREF);
+            audioSourcePref.setSummary(settingsPref.getString(AUDIO_SOURCE_PREF, ""));
         }
 
         @Override
@@ -48,10 +63,14 @@ public class SettingsActivity extends Activity {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-            if (s.equals("3G")) {
-                Preference connectionPref = findPreference(s);
+            if (s.equals(CONNECTIVITY_PREF)) {
+                Preference connectivityPref = findPreference(s);
                 // Set summary to be the user-description for the selected value
-                connectionPref.setSummary(sharedPreferences.getString(s, ""));
+                connectivityPref.setSummary(sharedPreferences.getString(s, ""));
+            } else if (s.equals(AUDIO_SOURCE_PREF)) {
+                Preference audioSourcePref = findPreference(s);
+                // Set summary to be the user-description for the selected value
+                audioSourcePref.setSummary(sharedPreferences.getString(s, ""));
             }
         }
     }

@@ -11,4 +11,14 @@
         <item>WiFi P2P</item>
         <item>3G</item>
     </string-array>
+
+    <string-array name="audio_source_entries">
+        <item>MIC</item>
+        <item>Voice Call</item>
+    </string-array>
+
+    <string-array name="audio_source_values">
+        <item>MIC</item>
+        <item>Voice Call</item>
+    </string-array>
 </resources>

@@ -2,10 +2,19 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <ListPreference
-        android:key="ConnectivityList"
+        android:key="ConnectivityPref"
         android:title="Connectivity"
         android:summary="Bluetooth"
         android:entries="@array/connectivity_entries"
-        android:entryValues="@array/connectivity_entries"/>
+        android:entryValues="@array/connectivity_entries"
+        android:defaultValue="bluetooth"/>
+
+    <ListPreference
+        android:key="AudioSourcePref"
+        android:title="Audio Source"
+        android:summary="MIC"
+        android:entries="@array/audio_source_entries"
+        android:entryValues="@array/audio_source_values"
+        android:defaultValue="mic"/>
 
 </PreferenceScreen>

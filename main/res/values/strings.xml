@@ -9,6 +9,7 @@
 
     <string name="share_bluetooth">Bluetooth</string>
     <string name="share_wifi_p2p">WiFi P2P</string>
+    <string name="share_3g">3G</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="title_new_devices">New Devices</string>

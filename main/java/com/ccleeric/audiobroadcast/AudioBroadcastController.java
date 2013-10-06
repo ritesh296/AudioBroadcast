@@ -5,9 +5,12 @@ import java.io.OutputStream;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,9 +26,9 @@ public class AudioBroadcastController implements Observer {
     private BluetoothManager mBtManager;
     private AudioRecorder mAudioRecorder;
     private AudioPlayer mAudioPlayer;
+    private Context mContext;
     private Handler mHandler;
     private boolean mSender;
-    private boolean mPressedBack;
 
     private AudioBroadcastController() {
         mBtManager = new BluetoothManager();
@@ -37,6 +40,7 @@ public class AudioBroadcastController implements Observer {
         mAudioPlayer = new AudioPlayer();
         mAudioPlayer.attachObserver(this);
         mSender = false;
+
     }
 
     public static synchronized AudioBroadcastController getInstance() {
@@ -50,6 +54,10 @@ public class AudioBroadcastController implements Observer {
         mHandler = handler;
     }
 
+    public void setContext(Context context) {
+        mContext = context;
+    }
+
     public void search() {
         mBtManager.doDiscovery();
     }
@@ -59,7 +67,6 @@ public class AudioBroadcastController implements Observer {
     }
 
     public void waitConnection() {
-        mPressedBack = false;
         mBtManager.listen();
     }
 
@@ -73,16 +80,21 @@ public class AudioBroadcastController implements Observer {
         if(mSender) {
             mAudioRecorder.stop();
         }
+
         mBtManager.disconnect();
     }
 
     public void playAudio() {
         mSender = false;
+
+        SharedPreferences settingsPref = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String audioSource = settingsPref.getString(SettingsActivity.PrefsFragement.AUDIO_SOURCE_PREF,"");
+        mAudioRecorder.setRecordSource(audioSource);
+
         mAudioRecorder.start(mBtManager.getAudioOutStream());
     }
 
     public void closeConnection() {
-        mPressedBack = true;
         mBtManager.stop();
         mBtManager.disconnect();
     }

@@ -96,7 +96,7 @@ public class AudioBroadcast extends Activity {
                 mSender = true;
                 Intent intent = new Intent(AudioBroadcast.this, PlayerActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putBoolean("Sender", true);
+                bundle.putBoolean("Sender", mSender);
                 intent.putExtras(bundle);
                 startActivityForResult(intent, AudioPlayer.ACTION_STOP);
 
@@ -108,6 +108,7 @@ public class AudioBroadcast extends Activity {
         BluetoothManager mBtManager = new BluetoothManager();
         mBroadcastController = AudioBroadcastController.getInstance();
         mBroadcastController.setHandler(mHandler);
+        mBroadcastController.setContext(this);
 
         // Register for broadcasts when a device is discovered
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -131,16 +132,6 @@ public class AudioBroadcast extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.action_menu, menu);
-
-
-        // Locate MenuItem with ShareActionProvider
-        //MenuItem item = menu.findItem(R.id.action_share);
-
-        // Fetch and store ShareActionProvider
-        //mShareActionProvider = (ShareActionProvider) item.getActionProvider();
-
-        //mShareActionProvider.setShareIntent(getDefaultIntent());
-
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -207,6 +198,9 @@ public class AudioBroadcast extends Activity {
                 case AudioPlayer.ACTION_PLAY:
                     mSearchProgress.setVisibility(View.GONE);
                     Intent intent = new Intent(AudioBroadcast.this, PlayerActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("Sender", mSender);
+                    intent.putExtras(bundle);
                     startActivityForResult(intent, AudioPlayer.ACTION_STOP);
                     break;
             }
@@ -222,7 +216,6 @@ public class AudioBroadcast extends Activity {
         if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivity(enableIntent);
-            // Otherwise, setup the chat session
         }
     }
 }

@@ -34,15 +34,22 @@ public class AudioRecorder implements Subject {
     private ArrayList<Observer> mObservers;
 
     public AudioRecorder() {
-        mAudioSource = MediaRecorder.AudioSource.MIC;
         mBufferSize = AudioRecord.getMinBufferSize(AUDIO_RATE_HZ,AUDIO_CHANNEL,AUDIO_FORMAT);
-
-        mRecorder = new AudioRecord(mAudioSource, AUDIO_RATE_HZ,
-                                        AUDIO_CHANNEL, AUDIO_FORMAT, mBufferSize);
         mAudioData = new byte[mBufferSize];
 
         mAudioStop = true;
         mObservers = new ArrayList<Observer>();
+    }
+
+    public void setRecordSource(String audioSource) {
+        int source = MediaRecorder.AudioSource.MIC;
+
+        if (audioSource.equals("Voice Call")) {
+            source = MediaRecorder.AudioSource.VOICE_CALL;
+        }
+        Log.d(TAG, "1111 audio source : " + String.valueOf(MediaRecorder.AudioSource.MIC) + " , " + audioSource);
+        mRecorder = new AudioRecord(source, AUDIO_RATE_HZ,
+                                AUDIO_CHANNEL, AUDIO_FORMAT, mBufferSize);
     }
 
     public void start(final OutputStream audioStream) {
