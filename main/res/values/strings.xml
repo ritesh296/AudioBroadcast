@@ -14,6 +14,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_new_devices">New Devices</string>
     <string name="title_paired_devices">Paired Devices</string>
+    <string name="none_paired">No devices have been paired,</string>
     <string name="title_player">FullscreenActivity</string>
 
     <string name="bluetooth">Bluetooth</string>

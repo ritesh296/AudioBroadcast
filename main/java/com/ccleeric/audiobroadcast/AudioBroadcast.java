@@ -7,25 +7,22 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
-import android.view.KeyEvent;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.ShareActionProvider;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 public class AudioBroadcast extends Activity {
 
@@ -33,13 +30,15 @@ public class AudioBroadcast extends Activity {
 
     public static final String TOAST = "toast";
     private static final int REQUEST_ENABLE_BT = 3;
+    private static final int REQUEST_SETTINGS = 4;
 
     private AudioBroadcastController mBroadcastController;
-    private ListView mNewDevicesListView;
-    private ListDevicesAdapter mNewDevicesArrayAdapter;
+    private ListView mNewDevices;
+    private ListView mPairedDevices;
+    private TextView mTitlePairedDevices;
+    private ListDevicesAdapter mNewDevicesAdapter;
+    private ListDevicesAdapter mPairedDevicesAdapter;
     private ProgressBar mSearchProgress;
-
-    private Intent mPlayerIntent;
 
     private boolean mSender;
 
@@ -69,6 +68,9 @@ public class AudioBroadcast extends Activity {
                     mBroadcastController.waitConnection();
                 }
                 break;
+            case REQUEST_SETTINGS:
+                invalidateOptionsMenu();
+                break;
         }
     }
 
@@ -84,15 +86,15 @@ public class AudioBroadcast extends Activity {
 
     public void init() {
 
-        mNewDevicesListView = (ListView) findViewById(R.id.new_devices);
-        mNewDevicesArrayAdapter = new ListDevicesAdapter(this, R.layout.list_item, new ArrayList<String>());
-        mNewDevicesListView.setAdapter(mNewDevicesArrayAdapter);
+        mNewDevices = (ListView) findViewById(R.id.new_devices);
+        mNewDevicesAdapter = new ListDevicesAdapter(this, R.layout.list_item, new ArrayList<String>());
+        mNewDevices.setAdapter(mNewDevicesAdapter);
 
-        mNewDevicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mNewDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                CheckBox box = (CheckBox)view.findViewById(R.id.checkbox);
-                TextView address = (TextView)view.findViewById(R.id.mac_address);
+                CheckBox box = (CheckBox) view.findViewById(R.id.checkbox);
+                TextView address = (TextView) view.findViewById(R.id.mac_address);
                 mSender = true;
                 Intent intent = new Intent(AudioBroadcast.this, PlayerActivity.class);
                 Bundle bundle = new Bundle();
@@ -101,14 +103,37 @@ public class AudioBroadcast extends Activity {
                 startActivityForResult(intent, AudioPlayer.ACTION_STOP);
 
                 mBroadcastController.connectDevice((String) address.getText());
-                box.toggle();
             }
         });
 
-        BluetoothManager mBtManager = new BluetoothManager();
+        mTitlePairedDevices = (TextView) findViewById(R.id.title_paired_devices);
+        mPairedDevices = (ListView) findViewById(R.id.paired_devices);
+        mPairedDevicesAdapter = new ListDevicesAdapter(this, R.layout.list_item, new ArrayList<String>());
+        mPairedDevices.setAdapter(mPairedDevicesAdapter);
+
+
+        mPairedDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                CheckBox box = (CheckBox) view.findViewById(R.id.checkbox);
+                TextView address = (TextView) view.findViewById(R.id.mac_address);
+                mSender = true;
+                Intent intent = new Intent(AudioBroadcast.this, PlayerActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("Sender", mSender);
+                intent.putExtras(bundle);
+                startActivityForResult(intent, AudioPlayer.ACTION_STOP);
+
+                mBroadcastController.connectDevice((String) address.getText());
+            }
+        });
+
+        showPairedDevices();
+
         mBroadcastController = AudioBroadcastController.getInstance();
         mBroadcastController.setHandler(mHandler);
         mBroadcastController.setContext(this);
+
 
         // Register for broadcasts when a device is discovered
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -129,9 +154,19 @@ public class AudioBroadcast extends Activity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        setDiscoverablityItem(menu);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.action_menu, menu);
+
+        setDiscoverablityItem(menu);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -140,20 +175,37 @@ public class AudioBroadcast extends Activity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_search:
-                mNewDevicesArrayAdapter.clear();
-                mNewDevicesArrayAdapter.notifyDataSetChanged();
+                mNewDevicesAdapter.clear();
+                mNewDevicesAdapter.notifyDataSetChanged();
+
+                mPairedDevicesAdapter.clear();
+                mPairedDevicesAdapter.notifyDataSetChanged();
+
+                showPairedDevices();
+
                 mSearchProgress.setVisibility(View.VISIBLE);
                 mBroadcastController.search();
                 return true;
-            case R.id.action_share:
+            case R.id.action_bt_discoverable:
                 enableDiscoverability();
                 return true;
             case R.id.action_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_SETTINGS);
             default:
                 return super.onMenuItemSelected(featureId, item);
         }
+    }
+
+    //set Bluetooth Discoverablity Item in Action bar
+    public void setDiscoverablityItem(Menu menu) {
+        MenuItem item = menu.findItem(R.id.action_bt_discoverable);
+        int action = MenuItem.SHOW_AS_ACTION_NEVER;
+        if(isBluetoothOfConnectivity()) {
+            action =MenuItem.SHOW_AS_ACTION_ALWAYS;
+        }
+
+        item.setShowAsAction(action);
     }
 
     /*
@@ -164,6 +216,34 @@ public class AudioBroadcast extends Activity {
                 Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 200);
         startActivity(discoverableIntent);
+    }
+
+    public void showPairedDevices() {
+        // Get a set of currently paired devices
+        BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+        Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
+
+        mTitlePairedDevices.setVisibility(View.VISIBLE);
+        // If there are paired devices, add each one to the ArrayAdapter
+        if (pairedDevices.size() > 0) {
+            findViewById(R.id.title_paired_devices).setVisibility(View.VISIBLE);
+            for (BluetoothDevice device : pairedDevices) {
+                mPairedDevicesAdapter.add(device.getName() + "," + device.getAddress());
+            }
+        } else {
+            mTitlePairedDevices.setVisibility(View.GONE);
+        }
+    }
+
+    public boolean isBluetoothOfConnectivity() {
+        SharedPreferences settingsPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String connectivity = settingsPref.getString(SettingsActivity.PrefsFragement.CONNECTIVITY_PREF,"");
+
+        boolean bluetooth = false;
+        if(connectivity.equals("Bluetooth")) {
+            bluetooth = true;
+        }
+        return bluetooth;
     }
 
     // Create a BroadcastReceiver for ACTION_FOUND & ACTION_DISCOVERY_FINISHED
@@ -178,10 +258,11 @@ public class AudioBroadcast extends Activity {
 
                 String title = device.getName() + "," + device.getAddress();
 
-                // Check the found device is exist in the list
-                if(mNewDevicesArrayAdapter.getPosition(title) < 0) {
+                // Check the found device is exist in paired devices or new devices
+                if (device.getBondState() != BluetoothDevice.BOND_BONDED &&
+                                        mNewDevicesAdapter.getPosition(title) < 0)  {
                     // Add the name and address to an array adapter to show in a ListView
-                    mNewDevicesArrayAdapter.add(title);
+                    mNewDevicesAdapter.add(title);
                 }
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 mSearchProgress.setVisibility(View.GONE);

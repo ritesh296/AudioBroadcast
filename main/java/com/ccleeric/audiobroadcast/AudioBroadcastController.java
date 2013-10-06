@@ -58,6 +58,10 @@ public class AudioBroadcastController implements Observer {
         mContext = context;
     }
 
+    public BluetoothManager getBtManager() {
+        return mBtManager;
+    }
+
     public void search() {
         mBtManager.doDiscovery();
     }
