@@ -47,7 +47,12 @@ public class AudioRecorder implements Subject {
         if (audioSource.equals("Voice Call")) {
             source = MediaRecorder.AudioSource.VOICE_CALL;
         }
-        Log.d(TAG, "1111 audio source : " + String.valueOf(MediaRecorder.AudioSource.MIC) + " , " + audioSource);
+
+        if(mRecorder != null) {
+            mRecorder.release();
+            mRecorder = null;
+        }
+
         mRecorder = new AudioRecord(source, AUDIO_RATE_HZ,
                                 AUDIO_CHANNEL, AUDIO_FORMAT, mBufferSize);
     }
@@ -77,6 +82,7 @@ public class AudioRecorder implements Subject {
                     }
                 }
                 mRecorder.stop();
+                mRecorder.release();
             }
         });
 
