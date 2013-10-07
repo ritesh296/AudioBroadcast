@@ -75,7 +75,6 @@ public class AudioBroadcastController implements Observer {
     }
 
     public void connectDevice(String address) {
-        Log.d(TAG, "1111 ConnectDevice in Controller!");
         mSender = true;
         mBtManager.connect(address);
     }
@@ -121,6 +120,10 @@ public class AudioBroadcastController implements Observer {
                 if(mSender) {
                     playAudio();
                 }
+                break;
+            case AudioRecorder.AUDIO_SOURCE_UNSUPPORTED:
+                sendMessage(action, (String)args);
+                mBtManager.disconnect();
                 break;
             case BluetoothManager.ACTION_CONNECT_FAILED:
                 sendMessage(action, (String)args);

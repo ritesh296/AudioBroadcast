@@ -17,8 +17,7 @@ public class AudioPlayer implements Subject {
 
     public static final int ACTION_PLAY  = 0x201;
     public static final int ACTION_STOP  = 0x202;
-    public static final String ACTION_PLAYER_STOP = "Player STOP";
-    public static final String ACTION_PLAYER_PLAY = "Player PLAY";
+
 
     private final int STREAM_TYPE = AudioManager.STREAM_MUSIC;          //
     private final int AUDIO_RATE_HZ = 8000;                            //Sample Rate 44100,22050, 16000, and 11025Hz
@@ -65,14 +64,14 @@ public class AudioPlayer implements Subject {
                         mAudioTrack.write(mAudioData, 0, mAudioData.length);
                     } catch (IOException e) {
                         Log.e(TAG, "disconnected", e);
-                        Log.d(TAG, "1111 audio player exception!");
+                        Log.d(TAG, "audio player exception!");
                         notifyObserver(BluetoothManager.ACTION_CONNECT_LOST,
                                                         "Device connection was lost") ;
                         break;
                     }
                 }
                 mAudioTrack.stop();
-                Log.d(TAG, "1111 audio player stopAudio");
+                Log.d(TAG, "audio player stopAudio");
             }
         });
 

@@ -19,8 +19,6 @@ public class BluetoothManager implements Subject{
 
     public static final int ACTION_CONNECT_LOST   = 0x101;
     public static final int ACTION_CONNECT_FAILED = 0x102;
-    public static final String ACTION_CONNECT_LOST1  = "CONNECTION_LOST";
-    public static final String ACTION_CONNECT_FAILED1 = "CONNETION_FAILED";
 
     private static final boolean D = true;
 

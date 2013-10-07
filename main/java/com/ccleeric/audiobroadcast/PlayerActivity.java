@@ -88,6 +88,7 @@ public class PlayerActivity extends Activity {
                     mAudioStop.setVisibility(View.VISIBLE);
                     mWaitConnection.setVisibility(View.GONE);
                     break;
+                case AudioRecorder.AUDIO_SOURCE_UNSUPPORTED:
                 case AudioPlayer.ACTION_STOP:
                 case BluetoothManager.ACTION_CONNECT_LOST:
                 case BluetoothManager.ACTION_CONNECT_FAILED:

@@ -29,6 +29,7 @@ public class AudioBroadcast extends Activity {
     private final String TAG = "AudioBroadcast";
 
     public static final String TOAST = "toast";
+    public static final String BLUETOOTH = "Bluetooth";
     private static final int REQUEST_ENABLE_BT = 3;
     private static final int REQUEST_SETTINGS = 4;
 
@@ -156,7 +157,7 @@ public class AudioBroadcast extends Activity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 
-        setDiscoverablityItem(menu);
+        setBeFoundItem(menu);
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -166,7 +167,7 @@ public class AudioBroadcast extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.action_menu, menu);
 
-        setDiscoverablityItem(menu);
+        setBeFoundItem(menu);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -186,8 +187,8 @@ public class AudioBroadcast extends Activity {
                 mSearchProgress.setVisibility(View.VISIBLE);
                 mBroadcastController.search();
                 return true;
-            case R.id.action_bt_discoverable:
-                enableDiscoverability();
+            case R.id.action_be_found:
+                enableBluetoothBeFound();
                 return true;
             case R.id.action_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
@@ -197,9 +198,9 @@ public class AudioBroadcast extends Activity {
         }
     }
 
-    //set Bluetooth Discoverablity Item in Action bar
-    public void setDiscoverablityItem(Menu menu) {
-        MenuItem item = menu.findItem(R.id.action_bt_discoverable);
+    //set Bluetooth be found function in action bar
+    public void setBeFoundItem(Menu menu) {
+        MenuItem item = menu.findItem(R.id.action_be_found);
         int action = MenuItem.SHOW_AS_ACTION_NEVER;
         if(isBluetoothOfConnectivity()) {
             action =MenuItem.SHOW_AS_ACTION_ALWAYS;
@@ -209,9 +210,9 @@ public class AudioBroadcast extends Activity {
     }
 
     /*
-     * Enable bluetooth to be discoverable.
+     * Enable bluetooth device to be found.
      */
-    public void enableDiscoverability() {
+    public void enableBluetoothBeFound() {
         Intent discoverableIntent = new
                 Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 200);
@@ -240,7 +241,7 @@ public class AudioBroadcast extends Activity {
         String connectivity = settingsPref.getString(SettingsActivity.PrefsFragement.CONNECTIVITY_PREF,"");
 
         boolean bluetooth = false;
-        if(connectivity.equals("Bluetooth")) {
+        if(connectivity.equals(BLUETOOTH)) {
             bluetooth = true;
         }
         return bluetooth;

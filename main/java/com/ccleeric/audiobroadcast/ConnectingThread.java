@@ -45,7 +45,7 @@ public class ConnectingThread extends Thread {
 
         // Make a connection to the BluetoothSocket
         try {
-            Log.d(TAG, "1111 waiting connect server");
+            Log.d(TAG, "waiting connect server");
             // This is a blocking call and will only return on a
             // successful connection or an exception
             mSocket.connect();
@@ -60,7 +60,7 @@ public class ConnectingThread extends Thread {
             return;
         }
 
-        Log.d(TAG, "11111 Client Connect Success!");
+        Log.d(TAG, "Client Connect Success!");
         mBtManager.finishConnecting();
         // Start the connected thread
         mBtManager.connected(mSocket);

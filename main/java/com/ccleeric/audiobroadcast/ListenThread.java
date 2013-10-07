@@ -45,7 +45,7 @@ public class ListenThread extends Thread {
         int state = mBtManager.getState();
         while (state != BluetoothManager.STATE_CONNECTED) {
             try {
-                Log.i(TAG, "1111 Waiting connecting ...");
+                Log.i(TAG, "Waiting connecting ...");
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
                 socket = mmServerSocket.accept();

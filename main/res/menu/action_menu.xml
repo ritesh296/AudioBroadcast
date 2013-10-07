@@ -4,9 +4,9 @@
         android:title="@string/action_search"
         android:showAsAction="always"/>
 
-    <item android:id="@+id/action_bt_discoverable"
-        android:icon="@drawable/action_share"
-        android:title="@string/action_share"
+    <item android:id="@+id/action_be_found"
+        android:icon="@drawable/action_be_found"
+        android:title="@string/action_be_found"
         android:showAsAction="always"/>
 
     <item android:id="@+id/action_settings"

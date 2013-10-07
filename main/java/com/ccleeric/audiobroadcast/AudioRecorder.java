@@ -15,10 +15,7 @@ import java.util.ArrayList;
 public class AudioRecorder implements Subject {
     private final String TAG = "AudioRecorder";
 
-    public static final int ACTION_RECORD_START = 0;
-    public static final int ACTION_RECORD_STOP  = 1;
-    public static final String ACTION_RECORD_START1 = "RECORD_START";
-    public static final String ACTION_RECORD_STOP1  = "RECORD_STOP";
+    public static final int AUDIO_SOURCE_UNSUPPORTED = 0x301;
 
 
     private final int AUDIO_RATE_HZ = 8000;                            //Sample Rate 44100,22050, 16000, and 11025Hz
@@ -26,7 +23,6 @@ public class AudioRecorder implements Subject {
     private final int AUDIO_FORMAT  = AudioFormat.ENCODING_PCM_16BIT;   //ENCODING_PCM_16BIT, ENCODING_PCM_8BIT
 
     private AudioRecord mRecorder;
-    private int mAudioSource;
     private int mBufferSize;
     private byte[] mAudioData;
     private boolean mAudioStop;
@@ -68,10 +64,16 @@ public class AudioRecorder implements Subject {
             @Override
             public void run() {
                 int bytes;
+                try {
+                    mRecorder.startRecording();
+                } catch (IllegalStateException e) {
+                    Log.e(TAG, "Audio Source doesn't support!", e);
+                    notifyObserver(AUDIO_SOURCE_UNSUPPORTED, "Audio Source doesn't support!");
+                    mRecorder.release();
+                    return;
+                }
 
-                mRecorder.startRecording();
                 while(!mAudioStop) {
-                    //Log.d(TAG, "1111 before recorder stream!");
                     bytes = mRecorder.read(mAudioData, 0, mBufferSize);
 
                     try {
